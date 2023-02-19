@@ -1,4 +1,4 @@
-# fly.toml file generated for poc-websocket-quarkus on 2023-02-19T18:11:57-03:00
+# fly.yml file generated for poc-websocket-quarkus on 2023-02-19T18:11:57-03:00
 
 app = "poc-websocket-quarkus"
 kill_signal = "SIGINT"

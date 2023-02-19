@@ -26,7 +26,6 @@ public class ChatSocket {
             return;
         }
         Log.info("Opening session for user: " + username);
-        // username@front-key ... verify if exists front-key and if it is the same remove it
         sessions.keySet().stream().filter(k -> k.endsWith("@" + username.split("@")[1])).forEach(k -> sessions.remove(k));
         sessions.put(username, session);
     }
@@ -39,7 +38,7 @@ public class ChatSocket {
     @OnError
     public void onError(Session session, @PathParam("username") String username, Throwable throwable) {
         sessions.remove(username);
-        broadcast(new Message(username, "left on error: " + throwable));
+        Log.error("Error on session for user: " + username, throwable);
     }
 
     @OnMessage
