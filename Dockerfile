@@ -75,20 +75,23 @@
 #   accessed directly. (example: "foo.example.com,bar.example.com")
 #
 ###
-FROM registry.access.redhat.com/ubi8/openjdk-17:1.14
-
-ENV LANGUAGE='en_US:en'
-
+FROM maven:3.8-openjdk-17 as maven
+WORKDIR /app
 COPY ./pom.xml .
 RUN mvn dependency:go-offline
 COPY ./src ./src
 RUN mvn package -DskipTests=true
+WORKDIR /app/target
 
+FROM registry.access.redhat.com/ubi8/openjdk-17:1.14
+
+ENV LANGUAGE='en_US:en'
+ARG TARGET=/app/target
 # We make four distinct layers so if there are application changes the library layers can be re-used
-COPY --chown=185 target/quarkus-app/lib/ /deployments/lib/
-COPY --chown=185 target/quarkus-app/*.jar /deployments/
-COPY --chown=185 target/quarkus-app/app/ /deployments/app/
-COPY --chown=185 target/quarkus-app/quarkus/ /deployments/quarkus/
+COPY --chown=185 --from=maven ${TARGET}/quarkus-app/lib/ /deployments/lib/
+COPY --chown=185 --from=maven ${TARGET}/quarkus-app/*.jar /deployments/
+COPY --chown=185 --from=maven ${TARGET}/quarkus-app/app/ /deployments/app/
+COPY --chown=185 --from=maven ${TARGET}/quarkus-app/quarkus/ /deployments/quarkus/
 
 EXPOSE 8080
 USER 185
