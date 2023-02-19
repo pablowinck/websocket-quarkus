@@ -79,6 +79,10 @@ FROM registry.access.redhat.com/ubi8/openjdk-17:1.14
 
 ENV LANGUAGE='en_US:en'
 
+COPY ./pom.xml .
+RUN mvn dependency:go-offline
+COPY ./src ./src
+RUN mvn package -DskipTests=true
 
 # We make four distinct layers so if there are application changes the library layers can be re-used
 COPY --chown=185 target/quarkus-app/lib/ /deployments/lib/
